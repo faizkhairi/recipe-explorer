@@ -1,184 +1,69 @@
-import { RecipeDetails } from './types';
+'use client'
 
-export const sampleRecipes: RecipeDetails[] = [
-  {
-    idMeal: '1001',
-    strMeal: 'Spaghetti Carbonara',
-    strCategory: 'Pasta',
-    strArea: 'Italian',
-    strInstructions: 'Bring a pot of salted water to the boil and cook the spaghetti according to package instructions.\r\n\r\nMeanwhile, heat a large skillet over medium heat. Add the diced pancetta and cook until crispy, about 5-7 minutes.\r\n\r\nIn a bowl, beat the eggs with the grated Pecorino Romano and Parmesan cheeses. Season with black pepper.\r\n\r\nWhen the pasta is cooked, reserve 1/2 cup of the pasta water, then drain the pasta.\r\n\r\nWorking quickly, add the hot pasta to the skillet with the pancetta, then remove from heat. Pour the egg and cheese mixture over the pasta, stirring quickly to create a creamy sauce. Add a splash of the reserved pasta water if needed to loosen the sauce.\r\n\r\nServe immediately with extra black pepper and grated cheese on top.',
-    strMealThumb: 'https://www.themealdb.com/images/media/meals/llcbn01574260722.jpg',
-    strTags: 'Pasta,Dairy,Pork',
-    strYoutube: 'https://www.youtube.com/watch?v=3AAdKl1UYZs',
-    strIngredient1: 'Spaghetti',
-    strIngredient2: 'Pancetta',
-    strIngredient3: 'Egg Yolks',
-    strIngredient4: 'Parmesan',
-    strIngredient5: 'Pecorino Romano',
-    strIngredient6: 'Black Pepper',
-    strIngredient7: 'Salt',
-    strMeasure1: '350g',
-    strMeasure2: '150g',
-    strMeasure3: '4',
-    strMeasure4: '50g',
-    strMeasure5: '50g',
-    strMeasure6: 'To taste',
-    strMeasure7: 'To taste'
-  },
-  {
-    idMeal: '1002',
-    strMeal: 'Thai Green Curry',
-    strCategory: 'Curry',
-    strArea: 'Thai',
-    strInstructions: 'In a large wok or skillet, heat the oil over medium-high heat. Add the green curry paste and cook for 1 minute until fragrant.\r\n\r\nAdd the chicken and stir-fry for 3-4 minutes until it begins to turn white on all sides.\r\n\r\nPour in the coconut milk and add the fish sauce, palm sugar, kaffir lime leaves, and bamboo shoots. Stir well.\r\n\r\nBring to a simmer and cook for 10-12 minutes until the chicken is cooked through and the sauce has slightly thickened.\r\n\r\nAdd the Thai eggplant and bell peppers, then cook for another 5 minutes until the vegetables are tender but still crisp.\r\n\r\nStir in the Thai basil leaves and remove from heat.\r\n\r\nServe hot with steamed jasmine rice.',
-    strMealThumb: 'https://www.themealdb.com/images/media/meals/sstssx1487349585.jpg',
-    strTags: 'Curry,Mild,MainMeal',
-    strYoutube: 'https://www.youtube.com/watch?v=LIbKVpBQKJI',
-    strIngredient1: 'Green Curry Paste',
-    strIngredient2: 'Chicken Thighs',
-    strIngredient3: 'Coconut Milk',
-    strIngredient4: 'Fish Sauce',
-    strIngredient5: 'Palm Sugar',
-    strIngredient6: 'Kaffir Lime Leaves',
-    strIngredient7: 'Bamboo Shoots',
-    strIngredient8: 'Thai Eggplant',
-    strIngredient9: 'Red Bell Pepper',
-    strIngredient10: 'Thai Basil',
-    strIngredient11: 'Jasmine Rice',
-    strMeasure1: '3 tbsp',
-    strMeasure2: '500g',
-    strMeasure3: '400ml',
-    strMeasure4: '2 tbsp',
-    strMeasure5: '1 tbsp',
-    strMeasure6: '4',
-    strMeasure7: '1 cup',
-    strMeasure8: '1 cup',
-    strMeasure9: '1',
-    strMeasure10: '1 handful',
-    strMeasure11: 'To serve'
-  },
-  {
-    idMeal: '1003',
-    strMeal: 'Mushroom Risotto',
-    strCategory: 'Rice',
-    strArea: 'Italian',
-    strInstructions: 'In a large pot, heat the chicken stock and keep warm over low heat.\r\n\r\nIn a large pan, melt 2 tablespoons of butter with the olive oil over medium heat. Add the onions and sauté until translucent, about 3 minutes. Add the garlic and cook for another minute.\r\n\r\nAdd the mushrooms and cook until they release their moisture and become tender, about 5-7 minutes.\r\n\r\nAdd the Arborio rice and stir to coat with the butter and oil. Toast the rice for 1-2 minutes until it becomes translucent around the edges.\r\n\r\nAdd the white wine and simmer until it has completely evaporated.\r\n\r\nAdd 1 cup of the warm stock and stir until absorbed. Continue adding stock, 1/2 cup at a time, stirring constantly and allowing each addition to be absorbed before adding the next. This should take about 18-20 minutes in total.\r\n\r\nWhen the rice is tender but still firm to the bite, remove from heat. Stir in the remaining butter, Parmesan cheese, and parsley. Season with salt and pepper to taste.\r\n\r\nLet the risotto rest for 2 minutes before serving. Garnish with additional Parmesan cheese if desired.',
-    strMealThumb: 'https://www.themealdb.com/images/media/meals/wwrrss1511789185.jpg',
-    strTags: 'MainMeal,Dairy',
-    strYoutube: 'https://www.youtube.com/watch?v=VOBihHeZuXE',
-    strIngredient1: 'Chicken Stock',
-    strIngredient2: 'Butter',
-    strIngredient3: 'Olive Oil',
-    strIngredient4: 'Onion',
-    strIngredient5: 'Garlic',
-    strIngredient6: 'Mushrooms',
-    strIngredient7: 'Arborio Rice',
-    strIngredient8: 'White Wine',
-    strIngredient9: 'Parmesan Cheese',
-    strIngredient10: 'Parsley',
-    strIngredient11: 'Salt',
-    strIngredient12: 'Black Pepper',
-    strMeasure1: '4 cups',
-    strMeasure2: '3 tbsp',
-    strMeasure3: '1 tbsp',
-    strMeasure4: '1',
-    strMeasure5: '2 cloves',
-    strMeasure6: '300g',
-    strMeasure7: '1 cup',
-    strMeasure8: '1/2 cup',
-    strMeasure9: '1/2 cup',
-    strMeasure10: '2 tbsp',
-    strMeasure11: 'To taste',
-    strMeasure12: 'To taste'
-  },
-  {
-    idMeal: '1004',
-    strMeal: 'Chicken Tikka Masala',
-    strCategory: 'Curry',
-    strArea: 'Indian',
-    strInstructions: 'For the chicken marinade: In a bowl, combine yogurt, lemon juice, garam masala, cumin, coriander, turmeric, ginger, garlic, and salt. Add the chicken pieces and coat well. Cover and refrigerate for at least 1 hour, preferably overnight.\r\n\r\nPreheat grill or broiler to high. Thread the chicken onto skewers and grill or broil for 5-7 minutes on each side until charred and cooked through. Set aside.\r\n\r\nFor the sauce: In a large pan, heat the butter or ghee over medium heat. Add the onions and cook until softened, about 5 minutes. Add the garlic and ginger, and cook for another minute.\r\n\r\nAdd the garam masala, cumin, coriander, turmeric, and paprika. Cook for 30 seconds until fragrant.\r\n\r\nAdd the tomato sauce and bring to a simmer. Cook for 10-15 minutes until the sauce thickens slightly.\r\n\r\nStir in the cream, sugar, and fenugreek leaves (if using). Simmer for another 5 minutes.\r\n\r\nAdd the grilled chicken pieces to the sauce and simmer for an additional 5 minutes to heat through.\r\n\r\nGarnish with fresh cilantro and serve with naan bread and basmati rice.',
-    strMealThumb: 'https://www.themealdb.com/images/media/meals/qptpvt1487339892.jpg',
-    strTags: 'Curry,Meat,Spicy',
-    strYoutube: 'https://www.youtube.com/watch?v=NshiJSNBWNs',
-    strIngredient1: 'Chicken Breast',
-    strIngredient2: 'Yogurt',
-    strIngredient3: 'Lemon Juice',
-    strIngredient4: 'Garam Masala',
-    strIngredient5: 'Cumin',
-    strIngredient6: 'Turmeric',
-    strIngredient7: 'Ground Coriander',
-    strIngredient8: 'Ginger',
-    strIngredient9: 'Garlic',
-    strIngredient10: 'Butter',
-    strIngredient11: 'Onion',
-    strIngredient12: 'Tomato Sauce',
-    strIngredient13: 'Heavy Cream',
-    strIngredient14: 'Sugar',
-    strIngredient15: 'Fenugreek Leaves',
-    strIngredient16: 'Fresh Cilantro',
-    strIngredient17: 'Basmati Rice',
-    strIngredient18: 'Naan Bread',
-    strMeasure1: '500g',
-    strMeasure2: '1 cup',
-    strMeasure3: '2 tbsp',
-    strMeasure4: '2 tsp',
-    strMeasure5: '1 tsp',
-    strMeasure6: '1 tsp',
-    strMeasure7: '1 tsp',
-    strMeasure8: '1 tbsp',
-    strMeasure9: '3 cloves',
-    strMeasure10: '2 tbsp',
-    strMeasure11: '1',
-    strMeasure12: '2 cups',
-    strMeasure13: '1 cup',
-    strMeasure14: '1 tsp',
-    strMeasure15: '1 tsp',
-    strMeasure16: 'For garnish',
-    strMeasure17: 'To serve',
-    strMeasure18: 'To serve'
-  },
-  {
-    idMeal: '1005',
-    strMeal: 'Beef Bourguignon',
-    strCategory: 'Beef',
-    strArea: 'French',
-    strInstructions: 'Preheat the oven to 325°F (165°C).\r\n\r\nHeat 1 tablespoon of oil in a large Dutch oven over medium heat. Add the bacon and cook until crispy. Remove the bacon and set aside, leaving the fat in the pot.\r\n\r\nPat the beef dry with paper towels and season generously with salt and pepper. Working in batches, add the beef to the pot and sear on all sides until browned, about 3-4 minutes per side. Transfer to a plate.\r\n\r\nAdd the carrots and onions to the pot and cook until the onions are translucent, about 5 minutes. Add the garlic and cook for another minute.\r\n\r\nSprinkle the flour over the vegetables and stir to coat. Cook for 1-2 minutes.\r\n\r\nSlowly add the red wine, scraping the bottom of the pot to release any browned bits. Add the beef stock, tomato paste, thyme, bay leaves, and return the beef and bacon to the pot. Bring to a simmer.\r\n\r\nCover the pot and transfer to the oven. Cook for 2.5-3 hours, or until the beef is very tender.\r\n\r\nAbout 1 hour before the stew is done, heat the remaining oil in a large skillet over medium heat. Add the mushrooms and cook until browned and have released their moisture, about 10 minutes. Add to the stew for the last hour of cooking.\r\n\r\nIn the same skillet, add the pearl onions and cook until lightly browned, about 8-10 minutes. Add to the stew for the last 30 minutes of cooking.\r\n\r\nRemove the bay leaves and thyme sprigs. Taste and adjust seasoning if necessary.\r\n\r\nServe hot, garnished with fresh parsley, alongside mashed potatoes or crusty bread.',
-    strMealThumb: 'https://www.themealdb.com/images/media/meals/wqurxy1511453156.jpg',
-    strTags: 'Beef,MainMeal,Stew',
-    strYoutube: 'https://www.youtube.com/watch?v=_imbNbTpfkw',
-    strIngredient1: 'Beef Chuck',
-    strIngredient2: 'Bacon',
-    strIngredient3: 'Onion',
-    strIngredient4: 'Carrots',
-    strIngredient5: 'Garlic',
-    strIngredient6: 'All-Purpose Flour',
-    strIngredient7: 'Red Wine',
-    strIngredient8: 'Beef Stock',
-    strIngredient9: 'Tomato Paste',
-    strIngredient10: 'Fresh Thyme',
-    strIngredient11: 'Bay Leaves',
-    strIngredient12: 'Mushrooms',
-    strIngredient13: 'Pearl Onions',
-    strIngredient14: 'Fresh Parsley',
-    strIngredient15: 'Salt',
-    strIngredient16: 'Black Pepper',
-    strIngredient17: 'Olive Oil',
-    strMeasure1: '3 pounds',
-    strMeasure2: '8 oz',
-    strMeasure3: '2',
-    strMeasure4: '3',
-    strMeasure5: '4 cloves',
-    strMeasure6: '2 tbsp',
-    strMeasure7: '750 ml',
-    strMeasure8: '2 cups',
-    strMeasure9: '2 tbsp',
-    strMeasure10: '4 sprigs',
-    strMeasure11: '2',
-    strMeasure12: '1 pound',
-    strMeasure13: '1 cup',
-    strMeasure14: 'For garnish',
-    strMeasure15: 'To taste',
-    strMeasure16: 'To taste',
-    strMeasure17: '3 tbsp'
-  }
-];
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { sampleRecipes } from '@/lib/sampleRecipes';
+
+export default function RecipesPage() {
+  const router = useRouter();
+
+  // Redirect to home after a brief delay
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      router.push('/');
+    }, 30000); // 30 seconds
+
+    return () => clearTimeout(timer);
+  }, [router]);
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-dark">Featured Recipes</h1>
+        <Link href="/" className="text-primary hover:underline">
+          Back to Home
+        </Link>
+      </div>
+
+      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+        <p className="text-yellow-700">
+          Example of 5 Featured Recipes.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {sampleRecipes.map(recipe => (
+          <Link href={`/recipes/${recipe.idMeal}`} key={recipe.idMeal} className="card group">
+            <div className="relative h-56 overflow-hidden">
+              <Image 
+                src={recipe.strMealThumb} 
+                alt={recipe.strMeal}
+                fill
+                className="object-cover transition-transform group-hover:scale-105"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <h2 className="text-xl font-bold text-white">{recipe.strMeal}</h2>
+                <p className="text-white/90 text-sm">{recipe.strArea} • {recipe.strCategory}</p>
+              </div>
+            </div>
+            <div className="p-4">
+              <p className="line-clamp-2 text-gray-600">
+                {recipe.strInstructions.split('\r\n')[0]}
+              </p>
+              <div className="mt-4 flex items-center text-sm text-primary font-medium">
+                View Recipe Details
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}

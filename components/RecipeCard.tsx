@@ -27,3 +27,4 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
       </div>
     </Link>
   );
+}

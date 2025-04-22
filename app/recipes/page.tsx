@@ -9,7 +9,7 @@ import { sampleRecipes } from '@/lib/sampleRecipes';
 export default function RecipesPage() {
   const router = useRouter();
 
-  // Redirect to home after a brief delay - this is just a demo page
+  // Redirect to home after a brief delay
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push('/');
@@ -29,9 +29,7 @@ export default function RecipesPage() {
 
       <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
         <p className="text-yellow-700">
-          This is a sample page showcasing 5 example recipes. Click on any recipe to view its details.
-          <br />
-          You will be redirected to the home page in 30 seconds.
+          Example of 5 Featured Recipes.
         </p>
       </div>
 

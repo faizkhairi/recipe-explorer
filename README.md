@@ -41,4 +41,4 @@ yarn dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in browser.
 
-Or just go here : https://recipe-explorer-five.vercel.app/
+5. Or just go here : https://recipe-explorer-five.vercel.app/

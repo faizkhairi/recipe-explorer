@@ -8,9 +8,10 @@ import toast from 'react-hot-toast';
 
 interface FeedbackFormProps {
   recipeId: string;
+  onSuccess?: () => void;
 }
 
-export default function FeedbackForm({ recipeId }: FeedbackFormProps) {
+export default function FeedbackForm({ recipeId, onSuccess }: FeedbackFormProps) {
   const [form, setForm] = useState<Omit<FeedbackFormType, 'recipeId'>>({
     name: '',
     email: '',
@@ -23,6 +24,7 @@ export default function FeedbackForm({ recipeId }: FeedbackFormProps) {
     onSuccess: () => {
       toast.success('Thank you for your feedback!');
       setForm({ name: '', email: '', rating: 5, comment: '' });
+      onSuccess?.();
     },
     onError: () => {
       toast.error('Failed to submit feedback. Please try again.');
@@ -40,7 +42,7 @@ export default function FeedbackForm({ recipeId }: FeedbackFormProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mt-8">
+    <div className="bg-gray-50 rounded-lg p-6 mt-8">
       <h3 className="text-xl font-semibold mb-4">Leave Your Feedback</h3>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

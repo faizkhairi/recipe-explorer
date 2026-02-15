@@ -1,23 +1,10 @@
 'use client'
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { sampleRecipes } from '@/lib/sampleRecipes';
 
-export default function RecipesPage() {
-  const router = useRouter();
-
-  // Redirect to home after a brief delay
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      router.push('/');
-    }, 30000); // 30 seconds
-
-    return () => clearTimeout(timer);
-  }, [router]);
-
+export default function FeaturedRecipesPage() {
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
@@ -29,7 +16,7 @@ export default function RecipesPage() {
 
       <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
         <p className="text-yellow-700">
-          Example of 5 Featured Recipes.
+          Hand-picked recipes to inspire your next meal.
         </p>
       </div>
 
@@ -37,8 +24,8 @@ export default function RecipesPage() {
         {sampleRecipes.map(recipe => (
           <Link href={`/recipes/${recipe.idMeal}`} key={recipe.idMeal} className="card group">
             <div className="relative h-56 overflow-hidden">
-              <Image 
-                src={recipe.strMealThumb} 
+              <Image
+                src={recipe.strMealThumb}
                 alt={recipe.strMeal}
                 fill
                 className="object-cover transition-transform group-hover:scale-105"
@@ -47,7 +34,7 @@ export default function RecipesPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-70"></div>
               <div className="absolute bottom-0 left-0 right-0 p-4">
                 <h2 className="text-xl font-bold text-white">{recipe.strMeal}</h2>
-                <p className="text-white/90 text-sm">{recipe.strArea} • {recipe.strCategory}</p>
+                <p className="text-white/90 text-sm">{recipe.strArea} &bull; {recipe.strCategory}</p>
               </div>
             </div>
             <div className="p-4">

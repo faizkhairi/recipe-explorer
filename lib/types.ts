@@ -59,3 +59,8 @@ export interface FeedbackForm {
   rating: number;
   comment: string;
 }
+
+export interface StoredFeedback extends FeedbackForm {
+  id: string;
+  createdAt: string;
+}

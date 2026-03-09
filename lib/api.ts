@@ -76,6 +76,28 @@ export async function fetchRecipesByCategory(category: string): Promise<Recipe[]
   }
 }
 
+export async function fetchAreas(): Promise<string[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/list.php?a=list`);
+    if (!response.ok) throw new Error('Failed to fetch areas');
+    const data = await response.json();
+    return data.meals?.map((m: { strArea: string }) => m.strArea).sort() || [];
+  } catch {
+    return ['American', 'British', 'Chinese', 'French', 'Indian', 'Italian', 'Japanese', 'Malaysian', 'Mexican', 'Thai'];
+  }
+}
+
+export async function fetchRecipesByArea(area: string): Promise<Recipe[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/filter.php?a=${encodeURIComponent(area)}`);
+    if (!response.ok) throw new Error('Failed to fetch recipes by area');
+    const data = await response.json();
+    return data.meals || [];
+  } catch {
+    return [];
+  }
+}
+
 export async function fetchRecipesByIngredient(ingredient: string): Promise<Recipe[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/filter.php?i=${encodeURIComponent(ingredient)}`);

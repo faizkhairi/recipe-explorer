@@ -1,6 +1,6 @@
 'use client'
 
-import { useRecipes, useCategories, useRecipesByCategory, useRecipesByIngredient } from '@/hooks/useRecipes';
+import { useRecipes, useCategories, useRecipesByCategory, useRecipesByIngredient, useAreas, useRecipesByArea } from '@/hooks/useRecipes';
 import RecipeCard from '@/components/RecipeCard';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { useState, useMemo, useEffect } from 'react';
@@ -8,6 +8,7 @@ import Link from 'next/link';
 
 type SearchMode = 'name' | 'ingredient';
 type SortOption = 'default' | 'az' | 'za';
+type FilterMode = 'category' | 'cuisine';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -32,7 +33,9 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [searchMode, setSearchMode] = useState<SearchMode>('name');
+  const [filterMode, setFilterMode] = useState<FilterMode>('category');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedArea, setSelectedArea] = useState('');
   const [sortOption, setSortOption] = useState<SortOption>('default');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -42,19 +45,22 @@ export default function Home() {
   }, [searchTerm]);
 
   const { data: categories } = useCategories();
+  const { data: areas } = useAreas();
   const { data: recipes, isLoading, isError, error, refetch } = useRecipes(
     searchMode === 'name' ? debouncedSearch : undefined
   );
   const { data: categoryRecipes, isLoading: isCategoryLoading } = useRecipesByCategory(selectedCategory);
+  const { data: areaRecipes, isLoading: isAreaLoading } = useRecipesByArea(selectedArea);
   const { data: ingredientRecipes, isLoading: isIngredientLoading } = useRecipesByIngredient(
     searchMode === 'ingredient' ? debouncedSearch : ''
   );
 
   const baseRecipes = useMemo(() => {
     if (searchMode === 'ingredient' && debouncedSearch) return ingredientRecipes ?? [];
+    if (selectedArea) return areaRecipes ?? [];
     if (selectedCategory) return categoryRecipes ?? [];
     return recipes ?? [];
-  }, [searchMode, debouncedSearch, selectedCategory, ingredientRecipes, categoryRecipes, recipes]);
+  }, [searchMode, debouncedSearch, selectedCategory, selectedArea, ingredientRecipes, categoryRecipes, areaRecipes, recipes]);
 
   const filteredRecipes = useMemo(() => {
     let result = baseRecipes;
@@ -74,16 +80,36 @@ export default function Home() {
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
+    setSelectedArea('');
     setCurrentPage(1);
     setSearchTerm('');
     setDebouncedSearch('');
     setSearchMode('name');
   };
 
+  const handleAreaChange = (area: string) => {
+    setSelectedArea(area);
+    setSelectedCategory('');
+    setCurrentPage(1);
+    setSearchTerm('');
+    setDebouncedSearch('');
+    setSearchMode('name');
+  };
+
+  const handleFilterModeChange = (mode: FilterMode) => {
+    setFilterMode(mode);
+    setSelectedCategory('');
+    setSelectedArea('');
+    setCurrentPage(1);
+  };
+
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     setCurrentPage(1);
-    if (value) setSelectedCategory('');
+    if (value) {
+      setSelectedCategory('');
+      setSelectedArea('');
+    }
   };
 
   const handleSearchModeChange = (mode: SearchMode) => {
@@ -92,9 +118,16 @@ export default function Home() {
     setDebouncedSearch('');
     setCurrentPage(1);
     setSelectedCategory('');
+    setSelectedArea('');
   };
 
-  const loading = isLoading || isCategoryLoading || (searchMode === 'ingredient' && isIngredientLoading && !!debouncedSearch);
+  const loading = isLoading || isCategoryLoading || isAreaLoading || (searchMode === 'ingredient' && isIngredientLoading && !!debouncedSearch);
+
+  const activeFilterLabel = selectedArea
+    ? `${selectedArea} cuisine`
+    : selectedCategory
+    ? selectedCategory
+    : null;
 
   return (
     <div>
@@ -142,39 +175,82 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Category filters + sort — hidden during ingredient search */}
+        {/* Filter panel — hidden during ingredient search */}
         {searchMode === 'name' && (
-          <div className="flex flex-wrap items-center gap-2 mb-6">
-            <div className="flex flex-wrap gap-2 flex-1">
+          <div className="mb-6">
+            {/* Filter mode toggle: Category / Cuisine */}
+            <div className="flex gap-1 mb-3 border-b border-gray-200">
               <button
-                onClick={() => handleCategoryChange('')}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  !selectedCategory ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                onClick={() => handleFilterModeChange('category')}
+                className={`px-4 py-1.5 text-sm font-medium border-b-2 transition-colors -mb-px ${
+                  filterMode === 'category'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                All
+                Category
               </button>
-              {categories?.map(cat => (
+              <button
+                onClick={() => handleFilterModeChange('cuisine')}
+                className={`px-4 py-1.5 text-sm font-medium border-b-2 transition-colors -mb-px ${
+                  filterMode === 'cuisine'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Cuisine
+              </button>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap gap-2 flex-1">
                 <button
-                  key={cat}
-                  onClick={() => handleCategoryChange(cat)}
+                  onClick={() => filterMode === 'category' ? handleCategoryChange('') : handleAreaChange('')}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                    selectedCategory === cat ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    (filterMode === 'category' ? !selectedCategory : !selectedArea)
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {cat}
+                  All
                 </button>
-              ))}
+
+                {filterMode === 'category'
+                  ? categories?.map(cat => (
+                      <button
+                        key={cat}
+                        onClick={() => handleCategoryChange(cat)}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                          selectedCategory === cat ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))
+                  : areas?.map(area => (
+                      <button
+                        key={area}
+                        onClick={() => handleAreaChange(area)}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                          selectedArea === area ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {area}
+                      </button>
+                    ))
+                }
+              </div>
+
+              <select
+                value={sortOption}
+                onChange={(e) => { setSortOption(e.target.value as SortOption); setCurrentPage(1); }}
+                className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+              >
+                <option value="default">Sort: Default</option>
+                <option value="az">Sort: A → Z</option>
+                <option value="za">Sort: Z → A</option>
+              </select>
             </div>
-            <select
-              value={sortOption}
-              onChange={(e) => { setSortOption(e.target.value as SortOption); setCurrentPage(1); }}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
-            >
-              <option value="default">Sort: Default</option>
-              <option value="az">Sort: A → Z</option>
-              <option value="za">Sort: Z → A</option>
-            </select>
           </div>
         )}
 
@@ -191,6 +267,7 @@ export default function Home() {
               <>
                 <p className="text-sm text-gray-500 mb-4">
                   Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredRecipes.length)} of {filteredRecipes.length} recipes
+                  {activeFilterLabel && ` in ${activeFilterLabel}`}
                   {searchMode === 'ingredient' && debouncedSearch && ` containing "${debouncedSearch}"`}
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

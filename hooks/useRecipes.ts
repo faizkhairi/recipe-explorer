@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query';
-import { fetchRecipes, fetchRecipeById, fetchCategories, fetchRecipesByCategory, fetchRecipesByIngredient } from '@/lib/api';
+import { fetchRecipes, fetchRecipeById, fetchCategories, fetchRecipesByCategory, fetchAreas, fetchRecipesByArea, fetchRecipesByIngredient } from '@/lib/api';
 
 export function useRecipes(searchQuery?: string) {
   return useQuery({
@@ -30,6 +30,23 @@ export function useRecipesByCategory(category: string) {
     queryKey: ['recipes', 'category', category],
     queryFn: () => fetchRecipesByCategory(category),
     enabled: !!category,
+  });
+}
+
+export function useAreas() {
+  return useQuery({
+    queryKey: ['areas'],
+    queryFn: fetchAreas,
+    staleTime: 10 * 60 * 1000,
+  });
+}
+
+export function useRecipesByArea(area: string) {
+  return useQuery({
+    queryKey: ['recipes', 'area', area],
+    queryFn: () => fetchRecipesByArea(area),
+    enabled: !!area,
+    staleTime: 5 * 60 * 1000,
   });
 }
 

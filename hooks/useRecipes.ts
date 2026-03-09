@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { fetchRecipes, fetchRecipeById, fetchCategories, fetchRecipesByCategory, fetchAreas, fetchRecipesByArea, fetchRecipesByIngredient } from '@/lib/api';
+import { searchSpoonacularByName, searchSpoonacularByIngredient, fetchSpoonacularRecipeById } from '@/lib/spoonacularApi';
 
 export function useRecipes(searchQuery?: string) {
   return useQuery({
@@ -56,5 +57,32 @@ export function useRecipesByIngredient(ingredient: string) {
     queryFn: () => fetchRecipesByIngredient(ingredient),
     enabled: !!ingredient,
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useSpoonacularSearch(query: string) {
+  return useQuery({
+    queryKey: ['spoonacular', 'name', query],
+    queryFn: () => searchSpoonacularByName(query),
+    enabled: !!query && query.length >= 2,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useSpoonacularIngredientSearch(ingredient: string) {
+  return useQuery({
+    queryKey: ['spoonacular', 'ingredient', ingredient],
+    queryFn: () => searchSpoonacularByIngredient(ingredient),
+    enabled: !!ingredient && ingredient.length >= 2,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useSpoonacularRecipeDetails(id: string) {
+  return useQuery({
+    queryKey: ['spoonacular', 'recipe', id],
+    queryFn: () => fetchSpoonacularRecipeById(id),
+    enabled: !!id,
+    staleTime: 10 * 60 * 1000,
   });
 }

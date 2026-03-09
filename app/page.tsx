@@ -1,6 +1,6 @@
 'use client'
 
-import { useRecipes, useCategories, useRecipesByCategory, useRecipesByIngredient, useAreas, useRecipesByArea } from '@/hooks/useRecipes';
+import { useRecipes, useCategories, useRecipesByCategory, useRecipesByIngredient, useAreas, useRecipesByArea, useSpoonacularSearch, useSpoonacularIngredientSearch } from '@/hooks/useRecipes';
 import RecipeCard from '@/components/RecipeCard';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { useState, useMemo, useEffect } from 'react';
@@ -54,13 +54,30 @@ export default function Home() {
   const { data: ingredientRecipes, isLoading: isIngredientLoading } = useRecipesByIngredient(
     searchMode === 'ingredient' ? debouncedSearch : ''
   );
+  const { data: spoonacularRecipes, isLoading: isSpoonacularLoading } = useSpoonacularSearch(
+    searchMode === 'name' ? debouncedSearch : ''
+  );
+  const { data: spoonacularIngredientRecipes, isLoading: isSpoonacularIngredientLoading } = useSpoonacularIngredientSearch(
+    searchMode === 'ingredient' ? debouncedSearch : ''
+  );
 
   const baseRecipes = useMemo(() => {
-    if (searchMode === 'ingredient' && debouncedSearch) return ingredientRecipes ?? [];
+    if (searchMode === 'ingredient' && debouncedSearch) {
+      const mdb = ingredientRecipes ?? [];
+      const spn = spoonacularIngredientRecipes ?? [];
+      const seen = new Set(mdb.map(r => r.strMeal.toLowerCase()));
+      return [...mdb, ...spn.filter(r => !seen.has(r.strMeal.toLowerCase()))];
+    }
     if (selectedArea) return areaRecipes ?? [];
     if (selectedCategory) return categoryRecipes ?? [];
+    if (debouncedSearch) {
+      const mdb = recipes ?? [];
+      const spn = spoonacularRecipes ?? [];
+      const seen = new Set(mdb.map(r => r.strMeal.toLowerCase()));
+      return [...mdb, ...spn.filter(r => !seen.has(r.strMeal.toLowerCase()))];
+    }
     return recipes ?? [];
-  }, [searchMode, debouncedSearch, selectedCategory, selectedArea, ingredientRecipes, categoryRecipes, areaRecipes, recipes]);
+  }, [searchMode, debouncedSearch, selectedCategory, selectedArea, ingredientRecipes, spoonacularIngredientRecipes, categoryRecipes, areaRecipes, recipes, spoonacularRecipes]);
 
   const filteredRecipes = useMemo(() => {
     let result = baseRecipes;
@@ -121,7 +138,9 @@ export default function Home() {
     setSelectedArea('');
   };
 
-  const loading = isLoading || isCategoryLoading || isAreaLoading || (searchMode === 'ingredient' && isIngredientLoading && !!debouncedSearch);
+  const loading = isLoading || isCategoryLoading || isAreaLoading ||
+    (searchMode === 'ingredient' && (isIngredientLoading || isSpoonacularIngredientLoading) && !!debouncedSearch) ||
+    (searchMode === 'name' && (isSpoonacularLoading) && !!debouncedSearch && !recipes?.length);
 
   const activeFilterLabel = selectedArea
     ? `${selectedArea} cuisine`

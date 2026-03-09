@@ -52,6 +52,35 @@ export interface RecipeDetails extends Recipe {
   strMeasure20?: string;
 }
 
+export interface SpoonacularIngredient {
+  id: number;
+  name: string;
+  amount: number;
+  unit: string;
+  original: string;
+}
+
+export interface SpoonacularStep {
+  number: number;
+  step: string;
+}
+
+export interface SpoonacularRecipeDetails {
+  id: number;
+  title: string;
+  image: string;
+  summary: string;
+  instructions: string;
+  readyInMinutes: number;
+  servings: number;
+  cuisines: string[];
+  dishTypes: string[];
+  extendedIngredients: SpoonacularIngredient[];
+  analyzedInstructions: Array<{ name: string; steps: SpoonacularStep[] }>;
+  sourceUrl: string;
+  creditsText: string;
+}
+
 export interface FeedbackForm {
   recipeId: string;
   name: string;

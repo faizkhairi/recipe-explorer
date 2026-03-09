@@ -13,8 +13,12 @@ interface RecipeCardProps {
 export default function RecipeCard({ recipe }: RecipeCardProps) {
   const { isFavorite, toggleFavorite } = useFavorites();
 
+  const isSpoonacular = recipe.idMeal.startsWith('spn_');
+  const numericId = isSpoonacular ? recipe.idMeal.replace('spn_', '') : recipe.idMeal;
+  const href = isSpoonacular ? `/spoonacular/${numericId}` : `/recipes/${recipe.idMeal}`;
+
   return (
-    <Link href={`/recipes/${recipe.idMeal}`} className="card block relative group">
+    <Link href={href} className="card block relative group">
       <div className="relative h-48">
         <Image
           src={recipe.strMealThumb}
@@ -30,6 +34,11 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
             className="bg-white/80 backdrop-blur-sm rounded-full p-1.5 shadow-sm"
           />
         </div>
+        {isSpoonacular && (
+          <div className="absolute top-2 left-2">
+            <span className="text-xs bg-orange-500 text-white px-1.5 py-0.5 rounded font-medium">Spoonacular</span>
+          </div>
+        )}
       </div>
       <div className="p-4">
         <h2 className="text-xl font-semibold mb-2 text-dark">{recipe.strMeal}</h2>

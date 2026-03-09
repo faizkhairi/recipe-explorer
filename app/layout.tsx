@@ -7,8 +7,19 @@ import QueryProvider from '@/components/QueryProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Recipe Explorer Lite',
+  title: 'Recipe Explorer',
   description: 'Browse delicious recipes from around the world',
+  openGraph: {
+    title: 'Recipe Explorer',
+    description: 'Browse delicious recipes from around the world',
+    type: 'website',
+    siteName: 'Recipe Explorer',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Recipe Explorer',
+    description: 'Browse delicious recipes from around the world',
+  },
 }
 
 export default function RootLayout({
@@ -23,7 +34,7 @@ export default function RootLayout({
           <main className="min-h-screen bg-gray-50">
             <header className="bg-primary shadow-md">
               <div className="container mx-auto py-6 px-4">
-                <h1 className="text-2xl md:text-3xl font-bold text-white">Recipe Explorer Lite</h1>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">Recipe Explorer</h1>
               </div>
             </header>
             <div className="container mx-auto py-8 px-4">
@@ -31,7 +42,7 @@ export default function RootLayout({
             </div>
             <footer className="bg-dark text-white py-6">
               <div className="container mx-auto px-4 text-center">
-                <p>© 2025 Recipe Explorer Lite</p>
+                <p>© 2025 Recipe Explorer</p>
               </div>
             </footer>
           </main>

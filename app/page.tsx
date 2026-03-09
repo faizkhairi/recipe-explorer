@@ -4,15 +4,21 @@ import { useRecipes, useCategories, useRecipesByCategory } from '@/hooks/useReci
 import RecipeCard from '@/components/RecipeCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 
 const ITEMS_PER_PAGE = 12;
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const { data: categories } = useCategories();
   const { data: recipes, isLoading, isError, error, refetch } = useRecipes();
@@ -22,11 +28,11 @@ export default function Home() {
 
   const filteredRecipes = useMemo(() => {
     if (!displayRecipes) return [];
-    if (!searchTerm) return displayRecipes;
+    if (!debouncedSearch) return displayRecipes;
     return displayRecipes.filter(recipe =>
-      recipe.strMeal.toLowerCase().includes(searchTerm.toLowerCase())
+      recipe.strMeal.toLowerCase().includes(debouncedSearch.toLowerCase())
     );
-  }, [displayRecipes, searchTerm]);
+  }, [displayRecipes, debouncedSearch]);
 
   const totalPages = Math.ceil(filteredRecipes.length / ITEMS_PER_PAGE);
   const paginatedRecipes = filteredRecipes.slice(
@@ -38,6 +44,7 @@ export default function Home() {
     setSelectedCategory(category);
     setCurrentPage(1);
     setSearchTerm('');
+    setDebouncedSearch('');
   };
 
   const handleSearch = (value: string) => {

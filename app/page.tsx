@@ -42,7 +42,9 @@ export default function Home() {
   }, [searchTerm]);
 
   const { data: categories } = useCategories();
-  const { data: recipes, isLoading, isError, error, refetch } = useRecipes();
+  const { data: recipes, isLoading, isError, error, refetch } = useRecipes(
+    searchMode === 'name' ? debouncedSearch : undefined
+  );
   const { data: categoryRecipes, isLoading: isCategoryLoading } = useRecipesByCategory(selectedCategory);
   const { data: ingredientRecipes, isLoading: isIngredientLoading } = useRecipesByIngredient(
     searchMode === 'ingredient' ? debouncedSearch : ''

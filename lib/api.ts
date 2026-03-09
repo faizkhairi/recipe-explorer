@@ -76,6 +76,21 @@ export async function fetchRecipesByCategory(category: string): Promise<Recipe[]
   }
 }
 
+export async function fetchRecipesByIngredient(ingredient: string): Promise<Recipe[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/filter.php?i=${encodeURIComponent(ingredient)}`);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch recipes by ingredient');
+    }
+
+    const data = await response.json();
+    return data.meals || [];
+  } catch {
+    return [];
+  }
+}
+
 export async function submitFeedback(feedback: FeedbackForm): Promise<{ success: boolean }> {
   return new Promise((resolve) => {
     setTimeout(() => {

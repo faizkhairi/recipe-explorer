@@ -1,18 +1,39 @@
 'use client'
 
-import { useRecipes, useCategories, useRecipesByCategory } from '@/hooks/useRecipes';
+import { useRecipes, useCategories, useRecipesByCategory, useRecipesByIngredient } from '@/hooks/useRecipes';
 import RecipeCard from '@/components/RecipeCard';
-import LoadingSpinner from '@/components/LoadingSpinner';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 
+type SearchMode = 'name' | 'ingredient';
+type SortOption = 'default' | 'az' | 'za';
+
 const ITEMS_PER_PAGE = 12;
+
+const SkeletonGrid = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {Array.from({ length: 6 }).map((_, i) => (
+      <div key={i} className="card animate-pulse">
+        <div className="h-48 bg-gray-200 rounded-t-lg" />
+        <div className="p-4 space-y-3">
+          <div className="h-5 bg-gray-200 rounded w-3/4" />
+          <div className="flex justify-between">
+            <div className="h-4 bg-gray-200 rounded w-1/4" />
+            <div className="h-4 bg-gray-200 rounded w-1/4" />
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchMode, setSearchMode] = useState<SearchMode>('name');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [sortOption, setSortOption] = useState<SortOption>('default');
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -23,16 +44,25 @@ export default function Home() {
   const { data: categories } = useCategories();
   const { data: recipes, isLoading, isError, error, refetch } = useRecipes();
   const { data: categoryRecipes, isLoading: isCategoryLoading } = useRecipesByCategory(selectedCategory);
+  const { data: ingredientRecipes, isLoading: isIngredientLoading } = useRecipesByIngredient(
+    searchMode === 'ingredient' ? debouncedSearch : ''
+  );
 
-  const displayRecipes = selectedCategory ? categoryRecipes : recipes;
+  const baseRecipes = useMemo(() => {
+    if (searchMode === 'ingredient' && debouncedSearch) return ingredientRecipes ?? [];
+    if (selectedCategory) return categoryRecipes ?? [];
+    return recipes ?? [];
+  }, [searchMode, debouncedSearch, selectedCategory, ingredientRecipes, categoryRecipes, recipes]);
 
   const filteredRecipes = useMemo(() => {
-    if (!displayRecipes) return [];
-    if (!debouncedSearch) return displayRecipes;
-    return displayRecipes.filter(recipe =>
-      recipe.strMeal.toLowerCase().includes(debouncedSearch.toLowerCase())
-    );
-  }, [displayRecipes, debouncedSearch]);
+    let result = baseRecipes;
+    if (searchMode === 'name' && debouncedSearch) {
+      result = result.filter(r => r.strMeal.toLowerCase().includes(debouncedSearch.toLowerCase()));
+    }
+    if (sortOption === 'az') return [...result].sort((a, b) => a.strMeal.localeCompare(b.strMeal));
+    if (sortOption === 'za') return [...result].sort((a, b) => b.strMeal.localeCompare(a.strMeal));
+    return result;
+  }, [baseRecipes, searchMode, debouncedSearch, sortOption]);
 
   const totalPages = Math.ceil(filteredRecipes.length / ITEMS_PER_PAGE);
   const paginatedRecipes = filteredRecipes.slice(
@@ -45,14 +75,24 @@ export default function Home() {
     setCurrentPage(1);
     setSearchTerm('');
     setDebouncedSearch('');
+    setSearchMode('name');
   };
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     setCurrentPage(1);
+    if (value) setSelectedCategory('');
   };
 
-  const loading = isLoading || isCategoryLoading;
+  const handleSearchModeChange = (mode: SearchMode) => {
+    setSearchMode(mode);
+    setSearchTerm('');
+    setDebouncedSearch('');
+    setCurrentPage(1);
+    setSelectedCategory('');
+  };
+
+  const loading = isLoading || isCategoryLoading || (searchMode === 'ingredient' && isIngredientLoading && !!debouncedSearch);
 
   return (
     <div>
@@ -69,46 +109,75 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Search bar with mode toggle */}
         <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Search recipes..."
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-
-        {categories && (
-          <div className="flex flex-wrap gap-2 mb-6">
-            <button
-              onClick={() => handleCategoryChange('')}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                !selectedCategory
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              All
-            </button>
-            {categories.map(cat => (
+          <div className="flex rounded-md border border-gray-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary">
+            <div className="flex border-r border-gray-300">
               <button
-                key={cat}
-                onClick={() => handleCategoryChange(cat)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  selectedCategory === cat
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                onClick={() => handleSearchModeChange('name')}
+                className={`px-3 py-2 text-sm font-medium transition-colors ${
+                  searchMode === 'name' ? 'bg-primary text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
               >
-                {cat}
+                By Name
               </button>
-            ))}
+              <button
+                onClick={() => handleSearchModeChange('ingredient')}
+                className={`px-3 py-2 text-sm font-medium transition-colors ${
+                  searchMode === 'ingredient' ? 'bg-primary text-white' : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                By Ingredient
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder={searchMode === 'ingredient' ? 'Search by ingredient (e.g. chicken, garlic)...' : 'Search recipes by name...'}
+              value={searchTerm}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="flex-1 px-4 py-2 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Category filters + sort — hidden during ingredient search */}
+        {searchMode === 'name' && (
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            <div className="flex flex-wrap gap-2 flex-1">
+              <button
+                onClick={() => handleCategoryChange('')}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  !selectedCategory ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                All
+              </button>
+              {categories?.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => handleCategoryChange(cat)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    selectedCategory === cat ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+            <select
+              value={sortOption}
+              onChange={(e) => { setSortOption(e.target.value as SortOption); setCurrentPage(1); }}
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+            >
+              <option value="default">Sort: Default</option>
+              <option value="az">Sort: A → Z</option>
+              <option value="za">Sort: Z → A</option>
+            </select>
           </div>
         )}
 
         {loading ? (
-          <LoadingSpinner />
+          <SkeletonGrid />
         ) : isError ? (
           <ErrorDisplay
             message={error?.message || 'Failed to load recipes'}
@@ -119,7 +188,8 @@ export default function Home() {
             {paginatedRecipes.length > 0 ? (
               <>
                 <p className="text-sm text-gray-500 mb-4">
-                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredRecipes.length)} of {filteredRecipes.length} recipes
+                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, filteredRecipes.length)} of {filteredRecipes.length} recipes
+                  {searchMode === 'ingredient' && debouncedSearch && ` containing "${debouncedSearch}"`}
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {paginatedRecipes.map(recipe => (
@@ -161,7 +231,11 @@ export default function Home() {
               </>
             ) : (
               <div className="text-center py-8">
-                <p className="text-lg text-gray-600">No recipes found. Try a different search term.</p>
+                <p className="text-lg text-gray-600">
+                  {searchMode === 'ingredient' && debouncedSearch
+                    ? `No recipes found containing "${debouncedSearch}".`
+                    : 'No recipes found. Try a different search term.'}
+                </p>
               </div>
             )}
           </>

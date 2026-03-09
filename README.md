@@ -1,31 +1,35 @@
 # Recipe Explorer
 
-A modern recipe browsing application built with **Next.js 15**, **React Query**, and **Tailwind CSS**. Browse, search, filter, and save your favorite recipes from around the world using [TheMealDB](https://www.themealdb.com/) API.
+A full-featured recipe discovery app built with **Next.js 15**, **React Query**, and **Tailwind CSS**. Browse, search by name or ingredient, filter, sort, and save your favourite recipes — no database required.
 
 **Live Demo:** [recipe-explorer-five.vercel.app](https://recipe-explorer-five.vercel.app/)
 
 ## Features
 
-- **Browse Recipes** — Explore a curated collection of recipes from TheMealDB API
-- **Search** — Find recipes by name with real-time filtering
-- **Category Filtering** — Filter recipes by category (Beef, Chicken, Dessert, Seafood, etc.)
-- **Recipe Details** — View full recipe with ingredients list, step-by-step instructions, and video tutorials
-- **Favorites** — Save your favorite recipes with localStorage persistence
-- **Feedback System** — Leave ratings and reviews on recipes, displayed with star ratings
-- **Pagination** — Navigate through large recipe collections with page controls
-- **Responsive Design** — Optimized for mobile, tablet, and desktop
-- **Error Handling** — Graceful fallbacks with sample recipes when API is unavailable
+- **Search by name or ingredient** — toggle between name-based and ingredient-based search modes using the TheMealDB filter API
+- **Category filters** — browse recipes by category (Beef, Chicken, Pasta, Seafood, and more)
+- **Sort options** — sort results A → Z or Z → A
+- **Recipe detail pages** — ingredients list with image fallback, step-by-step instructions, and YouTube tutorial links
+- **Related recipes** — discover similar dishes from the same category on every recipe page
+- **Favourites** — save recipes to a personal favourites list (persisted in localStorage)
+- **Feedback & ratings** — leave star ratings and comments on any recipe with client-side validation
+- **Featured recipes** — a curated hand-picked collection powered by a simple ID list
+- **SEO ready** — dynamic page titles, Open Graph tags, Twitter cards, and JSON-LD structured data on every recipe page
+- **Skeleton loading** — animated placeholder cards during data fetches
+- **Error boundary** — graceful crash recovery via Next.js `error.tsx`
+- **Custom 404** — friendly not-found page for unknown recipe IDs
+- **Responsive** — mobile-first design, tested across breakpoints
 
 ## Tech Stack
 
 | Technology | Purpose |
 |-----------|---------|
-| [Next.js 15](https://nextjs.org/) | React framework with App Router |
-| [React Query v5](https://tanstack.com/query) | Server state management and caching |
+| [Next.js 15](https://nextjs.org/) | React framework with App Router, server components, generateMetadata |
+| [React Query v5](https://tanstack.com/query) | Server state management, caching, parallel queries |
 | [Tailwind CSS](https://tailwindcss.com/) | Utility-first styling |
-| [TypeScript](https://www.typescriptlang.org/) | Type safety |
-| [TheMealDB API](https://www.themealdb.com/api.php) | Recipe data source |
-| [Vitest](https://vitest.dev/) | Unit testing |
+| [TypeScript](https://www.typescriptlang.org/) | Full type coverage |
+| [TheMealDB API](https://www.themealdb.com/api.php) | Recipe data source (free, no auth required) |
+| [Vitest](https://vitest.dev/) | Unit testing (30 tests) |
 | [react-hot-toast](https://react-hot-toast.com/) | Toast notifications |
 
 ## Getting Started
@@ -33,7 +37,7 @@ A modern recipe browsing application built with **Next.js 15**, **React Query**,
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
+- npm
 
 ### Installation
 
@@ -54,8 +58,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Testing
 
 ```bash
-npm test           # Run tests once
-npm run test:watch # Watch mode
+npm test             # Run all 30 tests once
+npm run test:watch   # Watch mode
 ```
 
 ### Build
@@ -70,55 +74,80 @@ npm start
 ```
 recipe-explorer/
 ├── app/
-│   ├── page.tsx                 # Home page (search, category filter, pagination)
-│   ├── layout.tsx               # Root layout with header/footer
-│   ├── favorites/page.tsx       # Saved favorites page
+│   ├── page.tsx                    # Home — search, ingredient filter, sort, pagination
+│   ├── layout.tsx                  # Root layout, global metadata, OG tags
+│   ├── error.tsx                   # Error boundary (catches unhandled throws)
+│   ├── not-found.tsx               # Custom 404 page
+│   ├── loading.tsx                 # Route-level skeleton loading
+│   ├── favorites/page.tsx          # Saved favourites page
 │   └── recipes/
-│       ├── page.tsx             # Featured recipes showcase
-│       └── [id]/page.tsx        # Recipe detail (ingredients, instructions, feedback)
+│       ├── page.tsx                # Featured recipes (curated list)
+│       └── [id]/
+│           ├── page.tsx            # Server component: generateMetadata + JSON-LD
+│           └── RecipeDetailClient.tsx  # Client component: interactive detail view
 ├── components/
-│   ├── RecipeCard.tsx           # Recipe card with favorite button
-│   ├── IngredientsList.tsx      # Ingredient list with images
-│   ├── FeedbackForm.tsx         # Rating and review form
-│   ├── FeedbackList.tsx         # Display submitted reviews
-│   ├── FavoriteButton.tsx       # Heart toggle button
-│   ├── LoadingSpinner.tsx       # Loading state
-│   ├── ErrorDisplay.tsx         # Error state with retry
-│   └── QueryProvider.tsx        # React Query provider
+│   ├── RecipeCard.tsx              # Recipe grid card with favourite toggle
+│   ├── IngredientsList.tsx         # Ingredient list with per-image error fallback
+│   ├── FeedbackForm.tsx            # Rating + review form with validation
+│   ├── FeedbackList.tsx            # Display submitted reviews
+│   ├── FavoriteButton.tsx          # Heart toggle button
+│   ├── LoadingSpinner.tsx          # Inline loading indicator
+│   ├── ErrorDisplay.tsx            # Error state with retry button
+│   └── QueryProvider.tsx           # React Query provider wrapper
 ├── hooks/
-│   ├── useRecipes.ts            # Recipe data hooks (search, details, categories)
-│   ├── useFavorites.ts          # localStorage favorites management
-│   └── useFeedback.ts           # localStorage feedback management
+│   ├── useRecipes.ts               # Recipe hooks (search, detail, category, ingredient)
+│   ├── useFavorites.ts             # localStorage favourites management
+│   ├── useFeedback.ts              # localStorage feedback management
+│   └── useCuratedRecipes.ts        # Parallel fetch for featured recipe list
 ├── lib/
-│   ├── api.ts                   # TheMealDB API client
-│   ├── types.ts                 # TypeScript interfaces
-│   └── sampleRecipes.ts         # Fallback recipe data
+│   ├── api.ts                      # TheMealDB API client (6 functions)
+│   ├── types.ts                    # TypeScript interfaces
+│   ├── curatedRecipes.ts           # IDs of hand-picked featured recipes
+│   └── sampleRecipes.ts            # Offline fallback recipes
 └── tests/
-    ├── setup.ts                 # Test configuration
-    ├── api.test.ts              # API function tests (10 tests)
-    ├── favorites.test.ts        # Favorites hook tests (5 tests)
-    └── feedback.test.ts         # Feedback hook tests (3 tests)
+    ├── setup.ts                    # Test configuration + localStorage mock
+    ├── api.test.ts                 # API function tests (10 tests)
+    ├── favorites.test.ts           # Favourites hook tests (5 tests)
+    ├── feedback.test.ts            # Feedback hook tests (3 tests)
+    ├── ingredient-search.test.ts   # Ingredient search API tests (5 tests)
+    └── validation.test.ts          # Feedback form validation tests (7 tests)
 ```
 
-## Architecture Decisions
+## Architecture Notes
 
-### Data Fetching with React Query
+### Server + Client Split (Recipe Detail)
 
-React Query handles all API communication with built-in caching (5-minute stale time), automatic retries, and loading/error states. Custom hooks (`useRecipes`, `useRecipeDetails`, `useCategories`) abstract the data layer from components.
+The recipe detail page uses a server/client component split to enable both dynamic metadata and interactive features:
 
-### Client-Side Storage
+- `app/recipes/[id]/page.tsx` — **server component**: fetches recipe + related recipes on the server, exports `generateMetadata` for SEO, injects JSON-LD structured data
+- `app/recipes/[id]/RecipeDetailClient.tsx` — **client component**: handles favourites, feedback, and interactive UI
 
-Favorites and feedback are persisted in `localStorage` since this is a frontend-only application with no backend. The `useFavorites` and `useFeedback` hooks provide a clean API for reading and writing this data.
+This means the browser tab shows the correct recipe title on first load (no waiting for client JS), and recipe pages are eligible for Google rich snippets.
 
-### TheMealDB API Integration
+### Data Fetching Strategy
 
-The app uses multiple TheMealDB endpoints:
-- `search.php?s=` — Search/browse all recipes
-- `lookup.php?i={id}` — Get recipe details by ID
-- `list.php?c=list` — List all categories
-- `filter.php?c={category}` — Filter recipes by category
+React Query manages all client-side state with 5-minute caching. `useQueries` (plural) fetches the curated recipe list in parallel — 12 simultaneous requests, each independently cached.
 
-When the API is unavailable, the app falls back to 5 built-in sample recipes.
+### Adding Featured Recipes
+
+Find a recipe on [TheMealDB](https://www.themealdb.com), note its ID from the URL, and add it to `lib/curatedRecipes.ts`:
+
+```ts
+export const curatedRecipeIds: string[] = [
+  '52772', // Teriyaki Chicken Casserole
+  '12345', // Your new recipe
+];
+```
+
+### TheMealDB API Endpoints Used
+
+| Endpoint | Purpose |
+|----------|---------|
+| `/search.php?s=` | Browse all / search by name |
+| `/lookup.php?i={id}` | Recipe details |
+| `/list.php?c=list` | List all categories |
+| `/filter.php?c={category}` | Filter by category |
+| `/filter.php?i={ingredient}` | Filter by ingredient |
 
 ## License
 

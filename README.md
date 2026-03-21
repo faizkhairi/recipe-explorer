@@ -1,8 +1,12 @@
 # Recipe Explorer
 
+![CI](https://github.com/faizkhairi/recipe-explorer/actions/workflows/ci.yml/badge.svg)
+
 A full-featured recipe discovery app built with **Next.js 15**, **React Query**, and **Tailwind CSS**. Browse, search by name or ingredient, filter, sort, and save your favourite recipes — no database required.
 
 **Live Demo:** [recipe-explorer-five.vercel.app](https://recipe-explorer-five.vercel.app/)
+
+![Recipe Explorer](docs/screenshot.png)
 
 ## Features
 

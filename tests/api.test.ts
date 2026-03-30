@@ -19,13 +19,19 @@ describe('API functions', () => {
   });
 
   describe('fetchRecipes', () => {
-    it('returns recipes from API', async () => {
+    it('returns sample recipes when called without query', async () => {
+      const recipes = await fetchRecipes();
+      expect(recipes.length).toBeGreaterThan(0);
+      expect(recipes[0].idMeal).toBe('1001');
+    });
+
+    it('returns recipes from API when query is provided', async () => {
       vi.spyOn(global, 'fetch').mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({ meals: [mockMeal] }),
       } as Response);
 
-      const recipes = await fetchRecipes();
+      const recipes = await fetchRecipes('teriyaki');
       expect(recipes).toHaveLength(1);
       expect(recipes[0].strMeal).toBe('Teriyaki Chicken Casserole');
     });
@@ -36,7 +42,7 @@ describe('API functions', () => {
         json: () => Promise.resolve({ meals: null }),
       } as Response);
 
-      const recipes = await fetchRecipes();
+      const recipes = await fetchRecipes('nonexistent');
       expect(recipes).toEqual([]);
     });
 

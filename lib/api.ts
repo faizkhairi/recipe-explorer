@@ -4,10 +4,10 @@ import { sampleRecipes } from './sampleRecipes';
 const API_BASE_URL = 'https://www.themealdb.com/api/json/v1/1';
 
 export async function fetchRecipes(query?: string): Promise<Recipe[]> {
+  if (!query) return sampleRecipes;
+
   try {
-    const endpoint = query
-      ? `${API_BASE_URL}/search.php?s=${encodeURIComponent(query)}`
-      : `${API_BASE_URL}/search.php?s=`;
+    const endpoint = `${API_BASE_URL}/search.php?s=${encodeURIComponent(query)}`;
 
     const response = await fetch(endpoint);
 

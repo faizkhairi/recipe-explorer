@@ -7,7 +7,8 @@ import { searchSpoonacularByName, searchSpoonacularByIngredient, fetchSpoonacula
 export function useRecipes(searchQuery?: string) {
   return useQuery({
     queryKey: ['recipes', searchQuery || ''],
-    queryFn: () => fetchRecipes(searchQuery),
+    queryFn: () => fetchRecipes(searchQuery!),
+    enabled: !!searchQuery,
   });
 }
 

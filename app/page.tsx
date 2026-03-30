@@ -3,6 +3,7 @@
 import { useRecipes, useCategories, useRecipesByCategory, useRecipesByIngredient, useAreas, useRecipesByArea, useSpoonacularSearch, useSpoonacularIngredientSearch } from '@/hooks/useRecipes';
 import RecipeCard from '@/components/RecipeCard';
 import ErrorDisplay from '@/components/ErrorDisplay';
+import { sampleRecipes } from '@/lib/sampleRecipes';
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 
@@ -76,7 +77,7 @@ export default function Home() {
       const seen = new Set(mdb.map(r => r.strMeal.toLowerCase()));
       return [...mdb, ...spn.filter(r => !seen.has(r.strMeal.toLowerCase()))];
     }
-    return recipes ?? [];
+    return recipes ?? sampleRecipes;
   }, [searchMode, debouncedSearch, selectedCategory, selectedArea, ingredientRecipes, spoonacularIngredientRecipes, categoryRecipes, areaRecipes, recipes, spoonacularRecipes]);
 
   const filteredRecipes = useMemo(() => {
@@ -138,9 +139,12 @@ export default function Home() {
     setSelectedArea('');
   };
 
-  const loading = isLoading || isCategoryLoading || isAreaLoading ||
+  const isInitialState = !debouncedSearch && !selectedCategory && !selectedArea;
+  const loading = !isInitialState && (
+    isLoading || isCategoryLoading || isAreaLoading ||
     (searchMode === 'ingredient' && (isIngredientLoading || isSpoonacularIngredientLoading) && !!debouncedSearch) ||
-    (searchMode === 'name' && (isSpoonacularLoading) && !!debouncedSearch && !recipes?.length);
+    (searchMode === 'name' && isSpoonacularLoading && !!debouncedSearch && !recipes?.length)
+  );
 
   const activeFilterLabel = selectedArea
     ? `${selectedArea} cuisine`

@@ -14,8 +14,8 @@ export async function GET(req: Request) {
 
   const recipes = query ? await searchSpoonacularByName(query) : await searchSpoonacularByIngredient(ingredient);
 
-  // Cache at the edge so repeated searches don't spend the Spoonacular quota.
-  return NextResponse.json(recipes, {
-    headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
-  });
+  // Cache hits at the edge so repeated searches don't spend the Spoonacular quota.
+  // Empty results are not cached: they may come from an upstream failure.
+  const cacheControl = recipes.length > 0 ? 'public, s-maxage=3600, stale-while-revalidate=86400' : 'no-store';
+  return NextResponse.json(recipes, { headers: { 'Cache-Control': cacheControl } });
 }

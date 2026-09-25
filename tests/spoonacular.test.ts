@@ -57,4 +57,11 @@ describe('GET /api/spoonacular/search', () => {
     expect((await GET(new Request('http://x/api/spoonacular/search'))).status).toBe(400);
     expect((await GET(new Request(`http://x/api/spoonacular/search?query=${'a'.repeat(101)}`))).status).toBe(400);
   });
+
+  it('does not edge-cache an empty result', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({ ok: false, status: 401 } as Response);
+    const { GET } = await import('@/app/api/spoonacular/search/route');
+    const res = await GET(new Request('http://x/api/spoonacular/search?query=pasta'));
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+  });
 });

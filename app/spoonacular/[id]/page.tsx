@@ -1,4 +1,4 @@
-import { fetchSpoonacularRecipeById } from '@/lib/spoonacularApi';
+import { fetchSpoonacularRecipeById } from '@/lib/spoonacular.server';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import SpoonacularDetailClient from './SpoonacularDetailClient';
